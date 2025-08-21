@@ -122,11 +122,11 @@ class XboxToPosNode(Node):
             # Z-axis control with A and Y
             if self.buttons.get('BTN_SOUTH', 0) == 1: # A button
                 self.current_pose.z -= sensitivity
-            if self.buttons.get('BTN_NORTH', 0) == 1: # Y button
+            if self.buttons.get('BTN_WEST', 0) == 1: # Y button
                 self.current_pose.z += sensitivity
 
             # Gripper control with X and B
-            if self.buttons.get('BTN_WEST', 0) == 1: # X button
+            if self.buttons.get('BTN_NORTH', 0) == 1: # X button
                 self.current_pose.gripper -= gripper_sensitivity
             if self.buttons.get('BTN_EAST', 0) == 1: # B button
                 self.current_pose.gripper += gripper_sensitivity
