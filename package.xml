@@ -2,14 +2,14 @@
 <package format="3">
   <name>controller_to_ros_msg</name>
   <version>0.0.1</version>
-  <description>Convert Xbox controller Joy messages to Piper PosCmd messages.</description>
+  <description>Convert Xbox controller events to Piper PosCmd messages.</description>
   <maintainer email="user@example.com">user</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_python</buildtool_depend>
 
   <depend>rclpy</depend>
-  <depend>sensor_msgs</depend>
+  
   <depend>piper_msgs</depend>
 
   <test_depend>ament_copyright</test_depend>

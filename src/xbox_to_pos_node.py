@@ -1,8 +1,9 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Joy
 from piper_msgs.msg import PosCmd
 import time
+import inputs
+import threading
 
 class XboxToPosNode(Node):
     def __init__(self):
@@ -10,13 +11,6 @@ class XboxToPosNode(Node):
 
         # Publisher for piper_ros
         self.pos_cmd_publisher = self.create_publisher(PosCmd, '/pos_cmd', 10)
-
-        # Subscriber for Xbox controller
-        self.joy_subscription = self.create_subscription(
-            Joy,
-            '/joy',
-            self.joy_callback,
-            10)
 
         # Initial state
         self.current_pose = PosCmd()
@@ -39,8 +33,18 @@ class XboxToPosNode(Node):
         self.lb_last_press_time = 0
         self.double_press_interval = 0.3  # seconds
 
+        self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0}
+        self.buttons = {'BTN_TR': 0, 'BTN_TL': 0}
+
         self.get_logger().info('Xbox to Piper PosCmd node started.')
         self.print_controls()
+
+        self.controller_thread = threading.Thread(target=self.process_controller_events)
+        self.controller_thread.daemon = True
+        self.controller_thread.start()
+
+        self.publisher_timer = self.create_timer(0.1, self.publish_pose)
+
 
     def print_controls(self):
         self.get_logger().info("--- Controls ---")
@@ -50,68 +54,87 @@ class XboxToPosNode(Node):
         self.get_logger().info("LB (Left Bumper): Change Left Stick Mode")
         self.get_logger().info("----------------")
 
-    def joy_callback(self, msg: Joy):
-        # --- Button Press Logic for Mode Switching ---
-        # Right Bumper (RB) - button 5
-        if msg.buttons[5] == 1:
-            current_time = time.time()
-            if (current_time - self.rb_last_press_time) < self.double_press_interval:
-                # Double press
-                self.right_stick_mode_index = (self.right_stick_mode_index + 2) % len(self.right_stick_modes)
-            else:
-                # Single press
-                self.right_stick_mode_index = (self.right_stick_mode_index + 1) % len(self.right_stick_modes)
-            self.rb_last_press_time = current_time
-            self.print_controls()
+    def process_controller_events(self):
+        try:
+            gamepad = inputs.devices.gamepads[0]
+        except IndexError:
+            self.get_logger().error("No gamepad found.")
+            return
 
-        # Left Bumper (LB) - button 4
-        if msg.buttons[4] == 1:
-            current_time = time.time()
-            if (current_time - self.lb_last_press_time) < self.double_press_interval:
-                # Double press
-                self.left_stick_mode_index = (self.left_stick_mode_index + 2) % len(self.left_stick_modes)
-            else:
-                # Single press
-                self.left_stick_mode_index = (self.left_stick_mode_index + 1) % len(self.left_stick_modes)
-            self.lb_last_press_time = current_time
-            self.print_controls()
+        while rclpy.ok():
+            try:
+                events = gamepad.read()
+            except EOFError:
+                self.get_logger().error("Gamepad disconnected.")
+                break
+            for event in events:
+                if event.ev_type == 'Key':
+                    self.handle_button_press(event)
+                elif event.ev_type == 'Absolute':
+                    self.handle_stick_move(event)
 
-        # --- Analog Stick Logic for Pose Update ---
+    def handle_button_press(self, event):
+        if event.code == 'BTN_TR': # Right Bumper (RB)
+            if event.state == 1: # Button pressed
+                current_time = time.time()
+                if (current_time - self.rb_last_press_time) < self.double_press_interval:
+                    self.right_stick_mode_index = (self.right_stick_mode_index + 2) % len(self.right_stick_modes)
+                else:
+                    self.right_stick_mode_index = (self.right_stick_mode_index + 1) % len(self.right_stick_modes)
+                self.rb_last_press_time = current_time
+                self.print_controls()
+
+        if event.code == 'BTN_TL': # Left Bumper (LB)
+            if event.state == 1: # Button pressed
+                current_time = time.time()
+                if (current_time - self.lb_last_press_time) < self.double_press_interval:
+                    self.left_stick_mode_index = (self.left_stick_mode_index + 2) % len(self.left_stick_modes)
+                else:
+                    self.left_stick_mode_index = (self.left_stick_mode_index + 1) % len(self.left_stick_modes)
+                self.lb_last_press_time = current_time
+                self.print_controls()
+
+    def handle_stick_move(self, event):
+        # Normalize axis value from -32768 to 32767 to -1.0 to 1.0
+        value = event.state / 32768.0
+        self.axes[event.code] = value
+
+    def publish_pose(self):
         sensitivity = 0.01
         rot_sensitivity = 0.02
 
-        # Right Stick (axes 3 for L/R, 4 for U/D)
-        right_stick_lr = msg.axes[3]
-        right_stick_ud = msg.axes[4]
+        # Right Stick
+        right_stick_lr = self.axes.get('ABS_RX', 0.0)
+        right_stick_ud = self.axes.get('ABS_RY', 0.0)
 
         right_mode = self.right_stick_modes[self.right_stick_mode_index]
         if right_mode == 'xy':
-            self.current_pose.x += right_stick_ud * sensitivity
+            self.current_pose.x -= right_stick_ud * sensitivity
             self.current_pose.y -= right_stick_lr * sensitivity
         elif right_mode == 'xz':
-            self.current_pose.x += right_stick_ud * sensitivity
+            self.current_pose.x -= right_stick_ud * sensitivity
             self.current_pose.z += right_stick_lr * sensitivity
         elif right_mode == 'yz':
-            self.current_pose.y += right_stick_ud * sensitivity
+            self.current_pose.y -= right_stick_ud * sensitivity
             self.current_pose.z += right_stick_lr * sensitivity
 
-        # Left Stick (axes 0 for L/R, 1 for U/D)
-        left_stick_lr = msg.axes[0]
-        left_stick_ud = msg.axes[1]
+        # Left Stick
+        left_stick_lr = self.axes.get('ABS_X', 0.0)
+        left_stick_ud = self.axes.get('ABS_Y', 0.0)
 
         left_mode = self.left_stick_modes[self.left_stick_mode_index]
         if left_mode == 'roll_pitch':
             self.current_pose.roll += left_stick_lr * rot_sensitivity
-            self.current_pose.pitch += left_stick_ud * rot_sensitivity
+            self.current_pose.pitch -= left_stick_ud * rot_sensitivity
         elif left_mode == 'pitch_yaw':
-            self.current_pose.pitch += left_stick_ud * rot_sensitivity
+            self.current_pose.pitch -= left_stick_ud * rot_sensitivity
             self.current_pose.yaw += left_stick_lr * rot_sensitivity
         elif left_mode == 'yaw_roll':
-            self.current_pose.yaw += left_stick_ud * rot_sensitivity
+            self.current_pose.yaw -= left_stick_ud * rot_sensitivity
             self.current_pose.roll += left_stick_lr * rot_sensitivity
 
-        # Publish the updated pose
         self.pos_cmd_publisher.publish(self.current_pose)
+
 
 def main(args=None):
     rclpy.init(args=args)

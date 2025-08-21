@@ -14,11 +14,11 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'inputs'],
     zip_safe=True,
     maintainer='user',
     maintainer_email='user@example.com',
-    description='Xbox controller to Piper PosCmd converter',
+    description='Xbox controller events to Piper PosCmd converter',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
