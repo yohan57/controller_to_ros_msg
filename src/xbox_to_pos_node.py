@@ -224,8 +224,17 @@ class XboxToPosNode(Node):
         elif dpad_y == 1: # D-pad Down - Yaw 감소
             self.current_pose.yaw -= rot_sensitivity
 
-        # 계산된 자세를 ROS 토픽으로 발행
-        self.pos_cmd_publisher.publish(self.current_pose)
+        # 계산된 자세를 소수점 2자리로 반올림하여 ROS 토픽으로 발행
+        rounded_pose = PosCmd()
+        rounded_pose.x = round(self.current_pose.x, 2)
+        rounded_pose.y = round(self.current_pose.y, 2)
+        rounded_pose.z = round(self.current_pose.z, 2)
+        rounded_pose.roll = round(self.current_pose.roll, 2)
+        rounded_pose.pitch = round(self.current_pose.pitch, 2)
+        rounded_pose.yaw = round(self.current_pose.yaw, 2)
+        rounded_pose.gripper = round(self.current_pose.gripper, 2)
+        
+        self.pos_cmd_publisher.publish(rounded_pose)
 
 
 def main(args=None):
