@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
-from piper_msgs.msg import PosCmd
+from piper_msgs.msg import PosCmd, PiperStatusMsg
+from sensor_msgs.msg import JointState
 import time
 import inputs
 import threading
@@ -12,6 +13,14 @@ class XboxToPosNode(Node):
 
         # piper_ros용 퍼블리셔 생성
         self.pos_cmd_publisher = self.create_publisher(PosCmd, '/pos_cmd', 10)
+        self.joint_state_publisher = self.create_publisher(JointState, '/joint_states', 10)
+
+        # arm_status 구독자 생성
+        self.arm_status_subscription = self.create_subscription(
+            PiperStatusMsg,
+            '/arm_status',
+            self.arm_status_callback,
+            10)
 
         # 중심점 정의 (로봇의 기본 자세)
         self.center_pose = PosCmd()
@@ -55,6 +64,22 @@ class XboxToPosNode(Node):
         # 0.1초마다 현재 자세를 발행하는 타이머 생성
         self.publisher_timer = self.create_timer(0.1, self.publish_pose)
 
+    def arm_status_callback(self, msg):
+        """arm_status 토픽 콜백 함수"""
+        if msg.arm_status != 0:
+            self.get_logger().warn(f'Arm status is not normal (status: {msg.arm_status}), returning to center.')
+            self.reset_joints_to_center()
+
+    def reset_joints_to_center(self):
+        """모든 조인트를 0으로 리셋하는 JointState 메시지를 발행"""
+        joint_state_msg = JointState()
+        joint_state_msg.header.stamp = self.get_clock().now().to_msg()
+        joint_state_msg.name = [f'joint{i}' for i in range(1, 9)]  # joint1 to joint8
+        joint_state_msg.position = [0.0] * 8
+        joint_state_msg.velocity = []
+        joint_state_msg.effort = []
+        self.joint_state_publisher.publish(joint_state_msg)
+        self.get_logger().info('Published JointState to reset arm to center.')
 
     def print_controls(self):
         """컨트롤러 조작법을 로그로 출력"""
