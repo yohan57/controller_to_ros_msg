@@ -34,7 +34,7 @@ class XboxToPosNode(Node):
         self.double_press_interval = 0.3  # seconds
 
         self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0}
-        self.buttons = {'BTN_TR': 0, 'BTN_TL': 0}
+        self.buttons = {'BTN_TR': 0, 'BTN_TL': 0, 'BTN_SOUTH': 0, 'BTN_EAST': 0}
 
         self.get_logger().info('Xbox to Piper PosCmd node started.')
         self.print_controls()
@@ -52,6 +52,8 @@ class XboxToPosNode(Node):
         self.get_logger().info(f"Left Stick Mode: {self.left_stick_modes[self.left_stick_mode_index].upper()} -> Left/Right: {self.left_stick_modes[self.left_stick_mode_index].split('_')[1]}, Up/Down: {self.left_stick_modes[self.left_stick_mode_index].split('_')[0]}")
         self.get_logger().info("RB (Right Bumper): Change Right Stick Mode")
         self.get_logger().info("LB (Left Bumper): Change Left Stick Mode")
+        if self.right_stick_modes[self.right_stick_mode_index] == 'xy':
+            self.get_logger().info("A Button: Z Down, B Button: Z Up")
         self.get_logger().info("----------------")
 
     def process_controller_events(self):
@@ -74,6 +76,9 @@ class XboxToPosNode(Node):
                     self.handle_stick_move(event)
 
     def handle_button_press(self, event):
+        if event.code in self.buttons:
+            self.buttons[event.code] = event.state
+
         if event.code == 'BTN_TR': # Right Bumper (RB)
             if event.state == 1: # Button pressed
                 current_time = time.time()
@@ -111,6 +116,10 @@ class XboxToPosNode(Node):
         if right_mode == 'xy':
             self.current_pose.x -= right_stick_ud * sensitivity
             self.current_pose.y -= right_stick_lr * sensitivity
+            if self.buttons.get('BTN_SOUTH', 0) == 1: # A button
+                self.current_pose.z -= sensitivity
+            if self.buttons.get('BTN_EAST', 0) == 1: # B button
+                self.current_pose.z += sensitivity
         elif right_mode == 'xz':
             self.current_pose.x -= right_stick_ud * sensitivity
             self.current_pose.z += right_stick_lr * sensitivity
