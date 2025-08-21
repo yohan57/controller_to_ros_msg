@@ -26,9 +26,9 @@ class XboxToPosNode(Node):
 
         # 초기 상태 (로봇의 시작 위치)
         self.current_pose = PosCmd()
-        self.current_pose.x = 0.3
+        self.current_pose.x = 0.055
         self.current_pose.y = 0.0
-        self.current_pose.z = 0.3
+        self.current_pose.z = 0.21
         self.current_pose.roll = 0.0
         self.current_pose.pitch = 1.57  # 90도 (라디안)
         self.current_pose.yaw = 0.0
@@ -63,6 +63,7 @@ class XboxToPosNode(Node):
                 self.get_logger().warn(f'Arm status is not normal (status: {msg.arm_status}), entering error state. Returning to center.')
                 self.error_state = True
             self.reset_joints_to_center()
+            self.reset_to_center()
         else:
             if self.error_state:
                 self.get_logger().info('Arm status is normal. Exiting error state.')
