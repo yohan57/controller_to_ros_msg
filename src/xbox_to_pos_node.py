@@ -11,9 +11,11 @@ class XboxToPosNode(Node):
     def __init__(self):
         super().__init__('xbox_to_pos_node')
 
+        self.error_state = False
+
         # piper_ros용 퍼블리셔 생성
         self.pos_cmd_publisher = self.create_publisher(PosCmd, '/pos_cmd', 10)
-        self.joint_state_publisher = self.create_publisher(JointState, '/joint_states', 10)
+        self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_ctrl_single', 10)
 
         # arm_status 구독자 생성
         self.arm_status_subscription = self.create_subscription(
@@ -67,19 +69,25 @@ class XboxToPosNode(Node):
     def arm_status_callback(self, msg):
         """arm_status 토픽 콜백 함수"""
         if msg.arm_status != 0:
-            self.get_logger().warn(f'Arm status is not normal (status: {msg.arm_status}), returning to center.')
+            if not self.error_state:
+                self.get_logger().warn(f'Arm status is not normal (status: {msg.arm_status}), entering error state. Returning to center.')
+                self.error_state = True
             self.reset_joints_to_center()
+        else:
+            if self.error_state:
+                self.get_logger().info('Arm status is normal. Exiting error state.')
+                self.error_state = False
 
     def reset_joints_to_center(self):
         """모든 조인트를 0으로 리셋하는 JointState 메시지를 발행"""
         joint_state_msg = JointState()
         joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-        joint_state_msg.name = [f'joint{i}' for i in range(1, 9)]  # joint1 to joint8
-        joint_state_msg.position = [0.0] * 8
-        joint_state_msg.velocity = []
-        joint_state_msg.effort = []
-        self.joint_state_publisher.publish(joint_state_msg)
-        self.get_logger().info('Published JointState to reset arm to center.')
+        joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
+        joint_state_msg.position = [0.0] * 7
+        joint_state_msg.velocity = [0.0] * 7
+        joint_state_msg.effort = [0.0] * 7
+        self.joint_ctrl_publisher.publish(joint_state_msg)
+        self.get_logger().info('Published JointState to reset arm to center on topic joint_ctrl_single.')
 
     def print_controls(self):
         """컨트롤러 조작법을 로그로 출력"""
@@ -175,6 +183,9 @@ class XboxToPosNode(Node):
 
     def publish_pose(self):
         """현재 자세를 계산하고 발행하는 메서드"""
+        if self.error_state:
+            return
+
         sensitivity = 0.01        # 위치 이동 민감도
         rot_sensitivity = 0.02    # 회전 민감도
         gripper_sensitivity = 0.005  # 그리퍼 민감도
