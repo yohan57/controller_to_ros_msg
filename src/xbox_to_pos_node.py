@@ -34,7 +34,7 @@ class XboxToPosNode(Node):
         self.current_pose.gripper = 0.0
 
         # 컨트롤러 축과 버튼 상태를 저장하는 딕셔너리
-        self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0, 'ABS_HAT0Y': 0, 'ABS_Z': 0, 'ABS_RZ': 0}
+        self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0, 'ABS_HAT0X': 0, 'ABS_Z': 0, 'ABS_RZ': 0}
         self.buttons = {'BTN_TR': 0, 'BTN_TL': 0, 'BTN_SOUTH': 0, 'BTN_EAST': 0, 'BTN_NORTH': 0, 'BTN_WEST': 0}
         
         # 트리거 버튼 눌림 상태
@@ -118,7 +118,7 @@ class XboxToPosNode(Node):
         self.current_pose.pitch = self.center_pose.pitch
         self.current_pose.yaw = self.center_pose.yaw
         self.current_pose.gripper = self.center_pose.gripper
-        self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0, 'ABS_HAT0Y': 0, 'ABS_Z': 0, 'ABS_RZ': 0}
+        self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0, 'ABS_HAT0X': 0, 'ABS_Z': 0, 'ABS_RZ': 0}
         self.buttons = {'BTN_TR': 0, 'BTN_TL': 0, 'BTN_SOUTH': 0, 'BTN_EAST': 0, 'BTN_NORTH': 0, 'BTN_WEST': 0}
         self.get_logger().info("Pose reset to center point.")
 
@@ -141,7 +141,7 @@ class XboxToPosNode(Node):
             self.lt_pressed = is_pressed
             return
 
-        if event.code == 'ABS_HAT0Y':  # D-pad는 이산값 (-1, 0, 1)
+        if event.code == 'ABS_HAT0X':  # D-pad는 이산값 (-1, 0, 1)
             self.axes[event.code] = event.state
         elif event.code in self.axes:
             # 축 값을 -32768~32767에서 -1.0~1.0으로 정규화
@@ -182,7 +182,7 @@ class XboxToPosNode(Node):
         self.current_pose.pitch -= left_stick_ud * rot_sensitivity
 
         # D-pad로 Yaw 제어
-        dpad_y = self.axes.get('ABS_HAT0Y', 0)
+        dpad_y = self.axes.get('ABS_HAT0X', 0)
         if dpad_y == -1: # D-pad Up - Yaw 증가
             self.current_pose.yaw += rot_sensitivity
         elif dpad_y == 1: # D-pad Down - Yaw 감소
