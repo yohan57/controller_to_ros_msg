@@ -34,7 +34,7 @@ class XboxToPosNode(Node):
         self.double_press_interval = 0.3  # seconds
 
         self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0}
-        self.buttons = {'BTN_TR': 0, 'BTN_TL': 0, 'BTN_SOUTH': 0, 'BTN_EAST': 0}
+        self.buttons = {'BTN_TR': 0, 'BTN_TL': 0, 'BTN_SOUTH': 0, 'BTN_EAST': 0, 'BTN_NORTH': 0, 'BTN_WEST': 0}
 
         self.get_logger().info('Xbox to Piper PosCmd node started.')
         self.print_controls()
@@ -53,7 +53,8 @@ class XboxToPosNode(Node):
         self.get_logger().info("RB (Right Bumper): Change Right Stick Mode")
         self.get_logger().info("LB (Left Bumper): Change Left Stick Mode")
         if self.right_stick_modes[self.right_stick_mode_index] == 'xy':
-            self.get_logger().info("A Button: Z Down, B Button: Z Up")
+            self.get_logger().info("A: Z Down, Y: Z Up")
+            self.get_logger().info("X: Gripper Close, B: Gripper Open")
         self.get_logger().info("----------------")
 
     def process_controller_events(self):
@@ -107,6 +108,7 @@ class XboxToPosNode(Node):
     def publish_pose(self):
         sensitivity = 0.01
         rot_sensitivity = 0.02
+        gripper_sensitivity = 0.05
 
         # Right Stick
         right_stick_lr = self.axes.get('ABS_RX', 0.0)
@@ -116,10 +118,22 @@ class XboxToPosNode(Node):
         if right_mode == 'xy':
             self.current_pose.x -= right_stick_ud * sensitivity
             self.current_pose.y -= right_stick_lr * sensitivity
+            
+            # Z-axis control with A and Y
             if self.buttons.get('BTN_SOUTH', 0) == 1: # A button
                 self.current_pose.z -= sensitivity
-            if self.buttons.get('BTN_EAST', 0) == 1: # B button
+            if self.buttons.get('BTN_NORTH', 0) == 1: # Y button
                 self.current_pose.z += sensitivity
+
+            # Gripper control with X and B
+            if self.buttons.get('BTN_WEST', 0) == 1: # X button
+                self.current_pose.gripper -= gripper_sensitivity
+            if self.buttons.get('BTN_EAST', 0) == 1: # B button
+                self.current_pose.gripper += gripper_sensitivity
+            
+            # Clamp gripper value
+            self.current_pose.gripper = max(0.0, min(1.0, self.current_pose.gripper))
+
         elif right_mode == 'xz':
             self.current_pose.x -= right_stick_ud * sensitivity
             self.current_pose.z += right_stick_lr * sensitivity
