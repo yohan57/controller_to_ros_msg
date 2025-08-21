@@ -24,16 +24,6 @@ class XboxToPosNode(Node):
             self.arm_status_callback,
             10)
 
-        # 중심점 정의 (로봇의 기본 자세)
-        self.center_pose = PosCmd()
-        self.center_pose.x = 0.0
-        self.center_pose.y = 0.0
-        self.center_pose.z = 0.0
-        self.center_pose.roll = 0.0
-        self.center_pose.pitch = 1.57  # 90도 (라디안)
-        self.center_pose.yaw = 0.0
-        self.center_pose.gripper = 0.0
-
         # 초기 상태 (로봇의 시작 위치)
         self.current_pose = PosCmd()
         self.current_pose.x = 0.3
@@ -144,13 +134,13 @@ class XboxToPosNode(Node):
 
     def reset_to_center(self):
         """현재 자세를 중심점으로 리셋"""
-        self.current_pose.x = self.center_pose.x
-        self.current_pose.y = self.center_pose.y
-        self.current_pose.z = self.center_pose.z
-        self.current_pose.roll = self.center_pose.roll
-        self.current_pose.pitch = self.center_pose.pitch
-        self.current_pose.yaw = self.center_pose.yaw
-        self.current_pose.gripper = self.center_pose.gripper
+        self.current_pose.x = 0.055
+        self.current_pose.y = 0.0
+        self.current_pose.z = 0.21
+        self.current_pose.roll = 0.0
+        self.current_pose.pitch = 1.57
+        self.current_pose.yaw = 0.0
+        self.current_pose.gripper = 0.0
         self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0, 'ABS_HAT0X': 0, 'ABS_Z': 0, 'ABS_RZ': 0}
         self.buttons = {'BTN_TR': 0, 'BTN_TL': 0, 'BTN_SOUTH': 0, 'BTN_EAST': 0, 'BTN_NORTH': 0, 'BTN_WEST': 0}
         self.get_logger().info("Pose reset to center point.")
@@ -224,17 +214,7 @@ class XboxToPosNode(Node):
         elif dpad_y == 1: # D-pad Down - Yaw 감소
             self.current_pose.yaw -= rot_sensitivity
 
-        # 계산된 자세를 소수점 2자리로 반올림하여 ROS 토픽으로 발행
-        rounded_pose = PosCmd()
-        rounded_pose.x = round(self.current_pose.x, 2)
-        rounded_pose.y = round(self.current_pose.y, 2)
-        rounded_pose.z = round(self.current_pose.z, 2)
-        rounded_pose.roll = round(self.current_pose.roll, 2)
-        rounded_pose.pitch = round(self.current_pose.pitch, 2)
-        rounded_pose.yaw = round(self.current_pose.yaw, 2)
-        rounded_pose.gripper = round(self.current_pose.gripper, 2)
-        
-        self.pos_cmd_publisher.publish(rounded_pose)
+        self.pos_cmd_publisher.publish(self.current_pose)
 
 
 def main(args=None):
