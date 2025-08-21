@@ -12,16 +12,12 @@
 CAN_INTERFACE="can0"
 BITRATE="1000000"
 # Use eval to handle the tilde (~) expansion for the home directory
-CAN_ACTIVATE_SCRIPT=$(eval echo "~/piper_sdk/piper_sdk/can_activate.sh")
+CAN_ACTIVATE_SCRIPT=$(eval echo "/home/linkxavier/piper_sdk/piper_sdk/can_activate.sh")
 MONITOR_TIMEOUT=5
-GST_DEVICE="/dev/video4"
+GST_DEVICE1="/dev/video4"
+GST_DEVICE2="/dev/video10"
 
 # --- Pre-flight Checks ---
-if [ "$EUID" -ne 0 ]; then
-  echo "Error: This script must be run as root or with sudo."
-  exit 1
-fi
-
 if ! command -v candump &> /dev/null; then
     echo "Error: 'candump' command not found. Please install can-utils."
     exit 1
@@ -84,11 +80,12 @@ ros2 launch piper start_single_piper.launch.py &
 
 # Start the controller node in the background
 echo "Launching controller node..."
-ros2 launch controller_to_ros_msg controller.launch.py &
+python3 /home/linkxavier/ros2_ws/src/controller_to_ros_msg/src/xbox_to_pos_node.py &
 
 # Start the camera stream in the background
 echo "Launching camera stream..."
-gst-launch-1.0 v4l2src device=${GST_DEVICE} ! video=x-raw, width=1280, height=720 ! autovideosink &
+gst-launch-1.0 v4l2src device=${GST_DEVICE1} ! video=x-raw, width=1280, height=720 ! autovideosink &
+gst-launch-1.0 v4l2src device=${GST_DEVICE2} ! video=x-raw, width=1280, height=720 ! autovideosink &
 
 echo "All components launched."
 
