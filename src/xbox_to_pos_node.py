@@ -118,6 +118,8 @@ class XboxToPosNode(Node):
         self.current_pose.pitch = self.center_pose.pitch
         self.current_pose.yaw = self.center_pose.yaw
         self.current_pose.gripper = self.center_pose.gripper
+        self.axes = {'ABS_X': 0, 'ABS_Y': 0, 'ABS_RX': 0, 'ABS_RY': 0, 'ABS_HAT0Y': 0, 'ABS_Z': 0, 'ABS_RZ': 0}
+        self.buttons = {'BTN_TR': 0, 'BTN_TL': 0, 'BTN_SOUTH': 0, 'BTN_EAST': 0, 'BTN_NORTH': 0, 'BTN_WEST': 0}
         self.get_logger().info("Pose reset to center point.")
 
 
@@ -150,7 +152,7 @@ class XboxToPosNode(Node):
         """현재 자세를 계산하고 발행하는 메서드"""
         sensitivity = 0.01        # 위치 이동 민감도
         rot_sensitivity = 0.02    # 회전 민감도
-        gripper_sensitivity = 0.05  # 그리퍼 민감도
+        gripper_sensitivity = 0.005  # 그리퍼 민감도
 
         # 오른쪽 스틱으로 X/Y 평면 제어
         right_stick_lr = self.axes.get('ABS_RX', 0.0)  # 좌우
@@ -170,8 +172,8 @@ class XboxToPosNode(Node):
         if self.buttons.get('BTN_EAST', 0) == 1: # B 버튼 - 그리퍼 열기
             self.current_pose.gripper += gripper_sensitivity
         
-        # 그리퍼 값을 0.0~1.0 범위로 제한
-        self.current_pose.gripper = max(0.0, min(1.0, self.current_pose.gripper))
+        # 그리퍼 값을 0.0~0.1 범위로 제한
+        self.current_pose.gripper = max(0.0, min(0.1, self.current_pose.gripper))
 
         # 왼쪽 스틱으로 Roll/Pitch 제어
         left_stick_lr = self.axes.get('ABS_X', 0.0)   # 좌우
