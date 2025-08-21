@@ -84,8 +84,8 @@ class XboxToPosNode(Node):
         joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
         joint_state_msg.position = [0.0] * 7
-        joint_state_msg.velocity = [0.0] * 7
-        joint_state_msg.effort = [0.0] * 7
+        joint_state_msg.velocity = []
+        joint_state_msg.effort = []
         self.joint_ctrl_publisher.publish(joint_state_msg)
         self.get_logger().info('Published JointState to reset arm to center on topic joint_ctrl_single.')
 
