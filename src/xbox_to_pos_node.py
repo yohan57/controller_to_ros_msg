@@ -177,8 +177,8 @@ class XboxToPosNode(Node):
         if self.error_state:
             return
 
-        sensitivity = 0.01        # 위치 이동 민감도
-        rot_sensitivity = 0.02    # 회전 민감도
+        sensitivity = 0.005        # 위치 이동 민감도
+        rot_sensitivity = 0.01    # 회전 민감도
         gripper_sensitivity = 0.005  # 그리퍼 민감도
 
         # 오른쪽 스틱으로 X/Y 평면 제어
