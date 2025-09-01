@@ -179,7 +179,7 @@ class XboxToPosNode(Node):
 
         sensitivity = 0.005        # 위치 이동 민감도
         rot_sensitivity = 0.01    # 회전 민감도
-        gripper_sensitivity = 0.005  # 그리퍼 민감도
+        gripper_sensitivity = 0.01  # 그리퍼 민감도
 
         # 오른쪽 스틱으로 X/Y 평면 제어
         right_stick_lr = self.axes.get('ABS_RX', 0.0)  # 좌우
@@ -200,7 +200,7 @@ class XboxToPosNode(Node):
             self.current_pose.gripper += gripper_sensitivity
         
         # 그리퍼 값을 0.0~0.1 범위로 제한
-        self.current_pose.gripper = max(0.0, min(0.1, self.current_pose.gripper))
+        self.current_pose.gripper = max(0.0, min(1.0, self.current_pose.gripper))
 
         # 왼쪽 스틱으로 Roll/Pitch 제어
         left_stick_lr = self.axes.get('ABS_X', 0.0)   # 좌우
@@ -214,6 +214,15 @@ class XboxToPosNode(Node):
             self.current_pose.yaw += rot_sensitivity
         elif dpad_y == 1: # D-pad Down - Yaw 감소
             self.current_pose.yaw -= rot_sensitivity
+
+        # 흔들림 감소를 위한 소수점 제한
+        self.current_pose.x = round(self.current_pose.x, 3)
+        self.current_pose.y = round(self.current_pose.y, 3)
+        self.current_pose.z = round(self.current_pose.z, 3)
+        self.current_pose.roll = round(self.current_pose.roll, 3)
+        self.current_pose.pitch = round(self.current_pose.pitch, 3)
+        self.current_pose.yaw = round(self.current_pose.yaw, 3)
+        self.current_pose.gripper = round(self.current_pose.gripper, 3)
 
         self.pos_cmd_publisher.publish(self.current_pose)
 
