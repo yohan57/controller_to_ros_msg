@@ -207,7 +207,7 @@ echo "NOTE: Make sure you have sourced your ROS 2 workspace in this terminal."
 
 # Start the piper robot launch file in the background
 echo "Launching Piper robot..."
-ros2 launch piper start_single_piper.launch.py &
+ros2 run piper piper_single_ctrl --ros-args -p can_port:=can0 -p auto_enable:=true -p gripper_exist:=true -p gripper_val_mutiple:=1.0 &
 ROS_LAUNCH_PID=$!
 
 # Start the controller node in the background
@@ -236,7 +236,8 @@ candump ${CAN_INTERFACE} | while read -r line; do
         # If a line is read, update the timestamp
         LAST_DATA_TIMESTAMP=$(date +%s)
         # Provide continuous feedback that things are working
-        echo -ne "OK: CAN data is flowing. Last message received at $(date +'%H:%M:%S'). ROS and camera are running..."
+        echo -ne "OK: CAN data is flowing. Last message received at $(date +'%H:%M:%S'). ROS and camera are running...
+"
     fi
 done &
 CANDUMP_PID=$!

@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'xbox_to_pos_node = controller_to_ros_msg.xbox_to_pos_node:main',
+            'operator_switch_node = controller_to_ros_msg.operator_switch_node:main',
         ],
     },
 )

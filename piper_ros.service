@@ -1,0 +1,17 @@
+[Unit]
+RequiresMountsFor=/home
+After=network.target multi-user.target
+Description=piper_ros
+
+[Service]
+Type=simple
+User=linkxavier
+Environment="RMW_IMPLEMENTATION=rmw_cyclonedds_cpp"
+Environment="CYCLONEDDS_URI=file:///home/linkxavier/robot_cfg/cyclonedds/cyclonedds.xml"
+ExecStart=/home/linkxavier/start_piper_ros.sh
+Restart=always
+WatchdogSec=0
+NotifyAccess=main
+
+[Install]
+WantedBy=multi-user.target
