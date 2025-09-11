@@ -67,17 +67,13 @@ class OperatorSwitchNode(Node):
                 self.get_logger().info('Action for data[0] == 0 triggered.')
                 self.set_preset_pose('gripper_close')
 
-        if data1 == 1:
+        if data1 == 1 and data2 == 0:
             self.get_logger().info('Action for data[1] == 1 triggered.')
             self.set_preset_pose('front')
-        else:
-            self.get_logger().info('Action for data[1] == 0 triggered.')
-            self.set_preset_pose('center')
-
-        if data2 == 1:
+        if data2 == 1 and data1 == 0:
             self.get_logger().info('Action for data[2] == 1 triggered.')
             self.set_preset_pose('behind')
-        else:
+        if data2 == 0 and data1 == 0:
             self.get_logger().info('Action for data[2] == 0 triggered.')
             self.set_preset_pose('center')
 
