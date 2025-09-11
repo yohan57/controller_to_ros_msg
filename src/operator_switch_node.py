@@ -21,7 +21,8 @@ class OperatorSwitchNode(Node):
 
         # piper_ros용 퍼블리셔 생성
         # self.pos_cmd_publisher = self.create_publisher(PosCmd, '/pos_cmd', 10)
-        self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_ctrl_single', 10)
+        # self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_ctrl_single', 10)
+        self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_states', 10)
 
         self.center_joint_state_msg = JointState()
         self.center_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
