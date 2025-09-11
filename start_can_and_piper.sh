@@ -6,7 +6,7 @@
 CAN_INTERFACE="can0"
 BITRATE="1000000"
 # Assuming the can_activate.sh script is in a fixed location
-CAN_ACTIVATE_SCRIPT="/home/linkxavier/piper_sdk/piper_sdk/can_activate.sh"
+CAN_ACTIVATE_SCRIPT="/home/linkxavier/scripts/can_activate.sh"
 
 # --- Source ROS Environment ---
 echo "Sourcing ROS 2 environment..."
