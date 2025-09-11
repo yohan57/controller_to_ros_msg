@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import UInt8MultiArray
-from piper_msgs.msg import PosCmd, PiperStatusMsg
+from piper_msgs.msg import PiperStatusMsg
 from sensor_msgs.msg import JointState
 
 class OperatorSwitchNode(Node):
@@ -39,6 +39,8 @@ class OperatorSwitchNode(Node):
         self.last_data0 = None
         self.last_data1 = None
         self.last_data2 = None
+
+        self.error_state = False
 
     def listener_callback(self, msg):
         self.get_logger().info(f'Received message: {list(msg.data)}')
