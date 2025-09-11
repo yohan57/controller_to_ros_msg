@@ -104,9 +104,11 @@ class OperatorSwitchNode(Node):
             self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
         elif pose_name == 'gripper_open':
             self.current_joint_state_msg.position[6] = 1.0
+            self.center_joint_state_msg.position[6] = 1.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'gripper_close':
             self.current_joint_state_msg.position[6] = 0.0
+            self.center_joint_state_msg.position[6] = 0.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'behind':
             self.current_joint_state_msg.position[0] = -2.724979572
