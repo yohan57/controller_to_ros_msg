@@ -20,18 +20,20 @@ class OperatorSwitchNode(Node):
             10)
 
         # piper_ros용 퍼블리셔 생성
-        self.pos_cmd_publisher = self.create_publisher(PosCmd, '/pos_cmd', 10)
+        # self.pos_cmd_publisher = self.create_publisher(PosCmd, '/pos_cmd', 10)
         self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_ctrl_single', 10)
 
-        # 초기 상태 (로봇의 시작 위치)
-        self.current_pose = PosCmd()
-        self.current_pose.x = 0.055
-        self.current_pose.y = 0.0
-        self.current_pose.z = 0.21
-        self.current_pose.roll = 0.0
-        self.current_pose.pitch = 1.57  # 90도 (라디안)
-        self.current_pose.yaw = 0.0
-        self.current_pose.gripper = 0.0
+        self.center_joint_state_msg = JointState()
+        self.center_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
+        self.center_joint_state_msg.position = [0.0] * 7
+        self.center_joint_state_msg.velocity = [0.0] * 7
+        self.center_joint_state_msg.effort = [0.0] * 6
+
+        self.current_joint_state_msg = JointState()
+        self.current_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
+        self.current_joint_state_msg.position = [0.0] * 7
+        self.current_joint_state_msg.velocity = [0.0] * 7
+        self.current_joint_state_msg.effort = [0.0] * 6
 
         # 이전 데이터 값 초기화
         self.last_data0 = None
@@ -63,9 +65,11 @@ class OperatorSwitchNode(Node):
                 self.set_preset_pose('gripper_close')
 
         if data1 == 1:
+            self.get_logger().info('Action for data[1] == 1 triggered.')
             self.set_preset_pose('behind')
 
         if data2 == 1:
+            self.get_logger().info('Action for data[2] == 1 triggered.')
             self.set_preset_pose('front')
 
     def arm_status_callback(self, msg):
@@ -75,7 +79,6 @@ class OperatorSwitchNode(Node):
                 self.get_logger().warn(f'Arm status is not normal (status: {msg.arm_status}), entering error state. Returning to center.')
                 self.error_state = True
             self.reset_joints_to_center()
-            self.reset_to_center()
         else:
             if self.error_state:
                 self.get_logger().info('Arm status is normal. Exiting error state.')
@@ -83,60 +86,37 @@ class OperatorSwitchNode(Node):
 
     def reset_joints_to_center(self):
         """모든 조인트를 0으로 리셋하는 JointState 메시지를 발행"""
-        joint_state_msg = JointState()
-        joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-        joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
-        joint_state_msg.position = [0.0] * 7
-        joint_state_msg.velocity = []
-        joint_state_msg.effort = []
-        self.joint_ctrl_publisher.publish(joint_state_msg)
+        self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
         self.get_logger().info('Published JointState to reset arm to center on topic joint_ctrl_single.')
         
-    def reset_to_center(self):
-        """초기 위치로 이동하는 PosCmd 메시지를 발행"""
-        self.current_pose.x = 0.055
-        self.current_pose.y = 0.0
-        self.current_pose.z = 0.21
-        self.current_pose.roll = 0.0
-        self.current_pose.pitch = 1.57
-        self.current_pose.yaw = 0.0
-        self.current_pose.gripper = 0.0
-        self.pos_cmd_publisher.publish(self.current_pose)
-        self.get_logger().info('Published PosCmd to reset arm to center on topic pos_cmd.')
-
-
     def set_preset_pose(self, pose_name):
         """사전 정의된 위치로 이동하는 PosCmd 메시지를 발행"""
         if pose_name == 'center':
-            self.current_pose.x = 0.055
-            self.current_pose.y = 0.0
-            self.current_pose.z = 0.21
-            self.current_pose.roll = 0.0
-            self.current_pose.pitch = 1.57
-            self.current_pose.yaw = 0.0
-            self.current_pose.gripper = 0.0
+            self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
         elif pose_name == 'gripper_open':
-            self.current_pose.gripper = 1.0
+            self.current_joint_state_msg.position[6] = 1.0
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'gripper_close':
-            self.current_pose.gripper = 0.0
+            self.current_joint_state_msg.position[6] = 0.0
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'behind':
-            self.current_pose.x = 0.055
-            self.current_pose.y = 0.0
-            self.current_pose.z = 0.21
-            self.current_pose.roll = 0.0
-            self.current_pose.pitch = 1.57
-            self.current_pose.yaw = 0.0
-            self.current_pose.gripper = 0.0
+            self.current_joint_state_msg.position[0] = -0.0562
+            self.current_joint_state_msg.position[1] = 1.889
+            self.current_joint_state_msg.position[2] = -1.68
+            self.current_joint_state_msg.position[3] = 1.749
+            self.current_joint_state_msg.position[4] = 0.501
+            self.current_joint_state_msg.position[5] = -2.114
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'front':         
-            self.current_pose.x = 0.055
-            self.current_pose.y = 0.0
-            self.current_pose.z = 0.21
-            self.current_pose.roll = 0.0
-            self.current_pose.pitch = 1.57
-            self.current_pose.yaw = 0.0
-            self.current_pose.gripper = 0.0
-        self.pos_cmd_publisher.publish(self.current_pose)
-        self.get_logger().info(f'Published PosCmd to set {pose_name} on topic pos_cmd.')
+            self.current_joint_state_msg.position[0] = 2.6074
+            self.current_joint_state_msg.position[1] = 2.761
+            self.current_joint_state_msg.position[2] = -2.0861
+            self.current_joint_state_msg.position[3] = -1.135
+            self.current_joint_state_msg.position[4] = -1.2640
+            self.current_joint_state_msg.position[5] = -1.6938
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
+
+        self.get_logger().info(f'Published JointState to set {pose_name} on topic joint_ctrl_single.')
 
 
 def main(args=None):
