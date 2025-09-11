@@ -26,7 +26,7 @@ class OperatorSwitchNode(Node):
         self.center_joint_state_msg = JointState()
         self.center_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
         self.center_joint_state_msg.position = [0.0] * 7
-        self.center_joint_state_msg.velocity = [0.0] * 7
+        self.center_joint_state_msg.velocity = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
         self.center_joint_state_msg.effort = [0.0] * 6
 
         self.current_joint_state_msg = JointState()
@@ -69,10 +69,16 @@ class OperatorSwitchNode(Node):
         if data1 == 1:
             self.get_logger().info('Action for data[1] == 1 triggered.')
             self.set_preset_pose('behind')
+        else:
+            self.get_logger().info('Action for data[1] == 0 triggered.')
+            self.set_preset_pose('center')
 
         if data2 == 1:
             self.get_logger().info('Action for data[2] == 1 triggered.')
             self.set_preset_pose('front')
+        else:
+            self.get_logger().info('Action for data[2] == 0 triggered.')
+            self.set_preset_pose('center')
 
     def arm_status_callback(self, msg):
         """arm_status 토픽 콜백 함수"""
@@ -102,20 +108,20 @@ class OperatorSwitchNode(Node):
             self.current_joint_state_msg.position[6] = 0.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'behind':
-            self.current_joint_state_msg.position[0] = -0.0562
-            self.current_joint_state_msg.position[1] = 1.889
-            self.current_joint_state_msg.position[2] = -1.68
-            self.current_joint_state_msg.position[3] = 1.749
-            self.current_joint_state_msg.position[4] = 0.501
-            self.current_joint_state_msg.position[5] = -2.114
+            self.current_joint_state_msg.position[0] = -2.724979572
+            self.current_joint_state_msg.position[1] = 0.34793802400000007
+            self.current_joint_state_msg.position[2] = 0.07563718400000001
+            self.current_joint_state_msg.position[3] = 0.9303059640000001
+            self.current_joint_state_msg.position[4] = -0.6247743040000001
+            self.current_joint_state_msg.position[5] = 0.693346668
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'front':         
-            self.current_joint_state_msg.position[0] = 2.6074
-            self.current_joint_state_msg.position[1] = 2.761
-            self.current_joint_state_msg.position[2] = -2.0861
-            self.current_joint_state_msg.position[3] = -1.135
-            self.current_joint_state_msg.position[4] = -1.2640
-            self.current_joint_state_msg.position[5] = -1.6938
+            self.current_joint_state_msg.position[0] = -0.054878824
+            self.current_joint_state_msg.position[1] = 2.175685456
+            self.current_joint_state_msg.position[2] = -2.046495192
+            self.current_joint_state_msg.position[3] = 1.524361384
+            self.current_joint_state_msg.position[4] = -0.018630192000000004
+            self.current_joint_state_msg.position[5] = 0.024439044000000004
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
 
         self.get_logger().info(f'Published JointState to set {pose_name} on topic joint_ctrl_single.')
