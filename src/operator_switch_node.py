@@ -27,13 +27,13 @@ class OperatorSwitchNode(Node):
         self.center_joint_state_msg = JointState()
         self.center_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
         self.center_joint_state_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
-        self.center_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0]
+        self.center_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0]
         self.center_joint_state_msg.effort = [0.0] * 6
 
         self.current_joint_state_msg = JointState()
         self.current_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
         self.current_joint_state_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
-        self.current_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0]
+        self.current_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0]
         self.current_joint_state_msg.effort = [0.0] * 6
 
         # 이전 데이터 값 초기화
@@ -69,14 +69,14 @@ class OperatorSwitchNode(Node):
 
         if data1 == 1:
             self.get_logger().info('Action for data[1] == 1 triggered.')
-            self.set_preset_pose('behind')
+            self.set_preset_pose('front')
         else:
             self.get_logger().info('Action for data[1] == 0 triggered.')
             self.set_preset_pose('center')
 
         if data2 == 1:
             self.get_logger().info('Action for data[2] == 1 triggered.')
-            self.set_preset_pose('front')
+            self.set_preset_pose('behind')
         else:
             self.get_logger().info('Action for data[2] == 0 triggered.')
             self.set_preset_pose('center')
