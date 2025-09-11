@@ -111,12 +111,12 @@ class OperatorSwitchNode(Node):
             self.center_joint_state_msg.position[6] = 0.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'behind':
-            self.current_joint_state_msg.position[0] = -2.724979572
-            self.current_joint_state_msg.position[1] = 0.34793802400000007
-            self.current_joint_state_msg.position[2] = 0.07563718400000001
-            self.current_joint_state_msg.position[3] = 0.9303059640000001
-            self.current_joint_state_msg.position[4] = -0.6247743040000001
-            self.current_joint_state_msg.position[5] = 0.693346668
+            self.current_joint_state_msg.position[0] = -2.5758159280000004
+            self.current_joint_state_msg.position[1] = 0.528518312
+            self.current_joint_state_msg.position[2] = -0.38394244000000005
+            self.current_joint_state_msg.position[3] = 1.465435552
+            self.current_joint_state_msg.position[4] = -0.652649816
+            self.current_joint_state_msg.position[5] = 0.148151892
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'front':         
             self.current_joint_state_msg.position[0] = -0.054878824
