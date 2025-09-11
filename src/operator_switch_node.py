@@ -27,13 +27,13 @@ class OperatorSwitchNode(Node):
         self.center_joint_state_msg = JointState()
         self.center_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
         self.center_joint_state_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
-        self.center_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0]
+        self.center_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0]
         self.center_joint_state_msg.effort = [0.0] * 6
 
         self.current_joint_state_msg = JointState()
         self.current_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
         self.current_joint_state_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
-        self.current_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0]
+        self.current_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0]
         self.current_joint_state_msg.effort = [0.0] * 6
 
         # 이전 데이터 값 초기화
@@ -97,14 +97,17 @@ class OperatorSwitchNode(Node):
     def set_preset_pose(self, pose_name):
         """사전 정의된 위치로 이동하는 PosCmd 메시지를 발행"""
         if pose_name == 'center':
+            self.current_joint_state_msg.velocity[6] = 30.0
             self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
         elif pose_name == 'gripper_open':
-            self.current_joint_state_msg.position[6] = 1.0
-            self.center_joint_state_msg.position[6] = 1.0
+            self.current_joint_state_msg.position[6] = 0.5
+            self.center_joint_state_msg.position[6] = 0.5
+            self.current_joint_state_msg.velocity[6] = 15.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'gripper_close':
             self.current_joint_state_msg.position[6] = 0.0
             self.center_joint_state_msg.position[6] = 0.0
+            self.current_joint_state_msg.velocity[6] = 15.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'behind':
             self.current_joint_state_msg.position[0] = -2.5758159280000004
@@ -113,6 +116,7 @@ class OperatorSwitchNode(Node):
             self.current_joint_state_msg.position[3] = 1.465435552
             self.current_joint_state_msg.position[4] = -0.652649816
             self.current_joint_state_msg.position[5] = 0.148151892
+            self.current_joint_state_msg.velocity[6] = 30.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'front':         
             self.current_joint_state_msg.position[0] = -0.054878824
@@ -121,6 +125,7 @@ class OperatorSwitchNode(Node):
             self.current_joint_state_msg.position[3] = 1.524361384
             self.current_joint_state_msg.position[4] = -0.018630192000000004
             self.current_joint_state_msg.position[5] = 0.024439044000000004
+            self.current_joint_state_msg.velocity[6] = 20.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
 
         self.get_logger().info(f'Published JointState to set {pose_name} on topic joint_ctrl_single.')
