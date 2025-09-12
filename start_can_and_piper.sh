@@ -49,6 +49,23 @@ echo "CAN interface '$CAN_INTERFACE' is UP."
 
 
 echo -e "\n### Step 2: Launching Piper Controller ###"
-ros2 run piper piper_single_ctrl --ros-args -p can_port:=$CAN_INTERFACE -p auto_enable:=true -p gripper_exist:=true -p gripper_multiplier:=1.0
+
+if [ -f "/opt/ros/galactic/setup.bash" ]; then
+    source /opt/ros/galactic/setup.bash
+else
+    echo "Error: ROS Galactic setup file not found." >&2
+    exit 1
+fi
+
+# Source the workspace overlay
+if [ -f "/home/linkxavier/ros2_ws/install/setup.bash" ]; then
+    source /home/linkxavier/ros2_ws/install/setup.bash
+else
+    echo "Warning: Workspace setup file not found." >&2
+fi
+
+# Run the operator switch node directly using Python
+echo "Starting operator_switch_node..."
+python3 /home/linkxavier/ros2_ws/src/controller_to_ros_msg/src/operator_switch_node.py
 
 echo "Script finished."
