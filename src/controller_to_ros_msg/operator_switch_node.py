@@ -5,9 +5,9 @@ from piper_msgs.msg import PiperStatusMsg
 from sensor_msgs.msg import JointState
 
 PRESET_POSES = {
-    "center": [0.0, 0.0, 0.0, 1.57, 0.0, 0.0],
-    "behind": [-2.5758, 0.5285, -0.3839, 1.4654, -0.6526, 0.1481],
-    "front": [-0.0314, 2.0758, -1.3262, 0.1568, -0.3117, 1.5299],
+    "center": [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0],
+    "behind": [-2.5758, 0.5285, -0.3839, 1.4654, -0.6526, 0.1481, 0.0],
+    "front": [-0.0314, 2.0758, -1.3262, 0.1568, -0.3117, 1.5299, 0.0],
 }
 
 class OperatorSwitchNode(Node):
