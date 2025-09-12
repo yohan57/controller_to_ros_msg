@@ -8,7 +8,7 @@ Type=simple
 User=linkxavier
 Environment="RMW_IMPLEMENTATION=rmw_cyclonedds_cpp"
 Environment="CYCLONEDDS_URI=file:///home/linkxavier/robot_cfg/cyclonedds/cyclonedds.xml"
-ExecStart=/home/linkxavier/controller_to_ros_msg/start_operator_switch.sh
+ExecStart=/home/linkxavier/scripts/start_operator_switch.sh
 Restart=always
 WatchdogSec=0
 NotifyAccess=main

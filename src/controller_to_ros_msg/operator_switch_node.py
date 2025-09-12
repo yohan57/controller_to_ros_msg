@@ -119,15 +119,12 @@ class OperatorSwitchNode(Node):
             self.current_joint_state_msg.velocity[6] = 30.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'front':         
-            # self.current_joint_state_msg.position[0] = -0.054878824
-            # self.current_joint_state_msg.position[4] = -0.018630192000000004
-            # self.current_joint_state_msg.position[5] = 0.024439044000000004
             self.current_joint_state_msg.position[0] = 0.0
-            self.current_joint_state_msg.position[1] = 2.175685456
-            self.current_joint_state_msg.position[2] = -2.046495192
-            self.current_joint_state_msg.position[3] = 1.524361384
-            self.current_joint_state_msg.position[4] = 0.0
-            self.current_joint_state_msg.position[5] = 0.0
+            self.current_joint_state_msg.position[1] = 2.0887794480000004
+            self.current_joint_state_msg.position[2] = -1.3416005960000001
+            self.current_joint_state_msg.position[3] = 0.0
+            self.current_joint_state_msg.position[4] = -0.24487887200000003
+            self.current_joint_state_msg.position[5] = -1.5991961440000002
             self.current_joint_state_msg.velocity[6] = 20.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
 
