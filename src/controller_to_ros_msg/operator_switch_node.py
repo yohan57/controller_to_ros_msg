@@ -97,8 +97,10 @@ class OperatorSwitchNode(Node):
     def set_preset_pose(self, pose_name):
         """사전 정의된 위치로 이동하는 PosCmd 메시지를 발행"""
         if pose_name == 'center':
-            self.current_joint_state_msg.velocity[6] = 30.0
-            self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
+            self.current_joint_state_msg.position = self.center_joint_state_msg.position
+            self.current_joint_state_msg.velocity = self.center_joint_state_msg.velocity
+            self.current_joint_state_msg.effort = self.center_joint_state_msg.effort
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'gripper_open':
             self.current_joint_state_msg.position[6] = 0.5
             self.center_joint_state_msg.position[6] = 0.5
