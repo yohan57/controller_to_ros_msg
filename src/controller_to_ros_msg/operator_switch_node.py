@@ -123,8 +123,8 @@ class OperatorSwitchNode(Node):
             self.current_joint_state_msg.position[1] = 2.0887794480000004
             self.current_joint_state_msg.position[2] = -1.3416005960000001
             self.current_joint_state_msg.position[3] = 0.0
-            self.current_joint_state_msg.position[4] = 1.524361384
-            self.current_joint_state_msg.position[5] = -1.5991961440000002
+            self.current_joint_state_msg.position[4] = -0.24487887200000003
+            self.current_joint_state_msg.position[5] = 0.0
             self.current_joint_state_msg.velocity[6] = 20.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
 
