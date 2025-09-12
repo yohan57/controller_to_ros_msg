@@ -4,12 +4,6 @@ from std_msgs.msg import UInt8MultiArray
 from piper_msgs.msg import PiperStatusMsg
 from sensor_msgs.msg import JointState
 
-PRESET_POSES = {
-    "center": [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0],
-    "behind": [-2.5758, 0.5285, -0.3839, 1.4654, -0.6526, 0.1481, 0.0],
-    "front": [-0.0314, 2.0758, -1.3262, 0.1568, -0.3117, 1.5299, 0.0],
-}
-
 class OperatorSwitchNode(Node):
     def __init__(self):
         super().__init__('operator_switch_node')
@@ -30,11 +24,17 @@ class OperatorSwitchNode(Node):
         self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_ctrl_single', 10)
         # self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_states', 10)
 
-        self.joint_state_ctrl_msg = JointState()
-        self.joint_state_ctrl_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
-        self.joint_state_ctrl_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
-        self.joint_state_ctrl_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0]
-        self.joint_state_ctrl_msg.effort = [0.0] * 6
+        self.center_joint_state_msg = JointState()
+        self.center_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
+        self.center_joint_state_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
+        self.center_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0]
+        self.center_joint_state_msg.effort = [0.0] * 6
+
+        self.current_joint_state_msg = JointState()
+        self.current_joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
+        self.current_joint_state_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
+        self.current_joint_state_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0]
+        self.current_joint_state_msg.effort = [0.0] * 6
 
         # 이전 데이터 값 초기화
         self.last_data0 = None
@@ -97,26 +97,37 @@ class OperatorSwitchNode(Node):
     def set_preset_pose(self, pose_name):
         """사전 정의된 위치로 이동하는 PosCmd 메시지를 발행"""
         if pose_name == 'center':
-            self.joint_state_ctrl_msg.position = PRESET_POSES["center"]
-            self.joint_state_ctrl_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0]
-            self.joint_state_ctrl_msg.effort = [0.0] * 6
-            self.joint_ctrl_publisher.publish(self.joint_state_ctrl_msg)
+            self.current_joint_state_msg.velocity[6] = 30.0
+            self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
+            self.current_joint_state_msg = self.center_joint_state_msg
         elif pose_name == 'gripper_open':
-            self.joint_state_ctrl_msg.position[6] = 0.5
-            self.joint_state_ctrl_msg.velocity[6] = 15.0
-            self.joint_ctrl_publisher.publish(self.joint_state_ctrl_msg)
+            self.current_joint_state_msg.position[6] = 0.5
+            self.center_joint_state_msg.position[6] = 0.5
+            self.current_joint_state_msg.velocity[6] = 15.0
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'gripper_close':
-            self.joint_state_ctrl_msg.position[6] = 0.0
-            self.joint_state_ctrl_msg.velocity[6] = 15.0
-            self.joint_ctrl_publisher.publish(self.joint_state_ctrl_msg)
+            self.current_joint_state_msg.position[6] = 0.0
+            self.center_joint_state_msg.position[6] = 0.0
+            self.current_joint_state_msg.velocity[6] = 15.0
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'behind':
-            self.joint_state_ctrl_msg.position = PRESET_POSES["behind"]
-            self.joint_state_ctrl_msg.velocity[6] = 30.0
-            self.joint_ctrl_publisher.publish(self.joint_state_ctrl_msg)
+            self.current_joint_state_msg.position[0] = -2.5758159280000004
+            self.current_joint_state_msg.position[1] = 0.528518312
+            self.current_joint_state_msg.position[2] = -0.38394244000000005
+            self.current_joint_state_msg.position[3] = 1.465435552
+            self.current_joint_state_msg.position[4] = -0.652649816
+            self.current_joint_state_msg.position[5] = 0.148151892
+            self.current_joint_state_msg.velocity[6] = 30.0
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'front':         
-            self.joint_state_ctrl_msg.position = PRESET_POSES["front"]
-            self.joint_state_ctrl_msg.velocity[6] = 20.0
-            self.joint_ctrl_publisher.publish(self.joint_state_ctrl_msg)
+            self.current_joint_state_msg.position[0] = -0.03148642
+            self.current_joint_state_msg.position[1] = 2.075818556
+            self.current_joint_state_msg.position[2] = -1.3262673200000001
+            self.current_joint_state_msg.position[3] = 0.156839004
+            self.current_joint_state_msg.position[4] = -0.31172428
+            self.current_joint_state_msg.position[5] = 1.529908576
+            self.current_joint_state_msg.velocity[6] = 20.0
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
 
         self.get_logger().info(f'Published JointState to set {pose_name} on topic joint_ctrl_single.')
 
