@@ -66,6 +66,7 @@ class OperatorSwitchNode(Node):
             else:
                 self.get_logger().info('Action for data[0] == 0 triggered.')
                 self.set_preset_pose('gripper_close')
+            return
 
         if self.last_data1 is None or (data1, data2) != (self.last_data1, self.last_data2):
             if data1 == 1 and data2 == 0:
