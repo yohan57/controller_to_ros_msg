@@ -31,6 +31,10 @@ class OperatorSwitchNode(Node):
         # self.joint_ctrl_publisher = self.create_publisher(JointState, 'joint_states', 10)
 
         self.joint_state_ctrl_msg = JointState()
+        self.joint_state_ctrl_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper']
+        self.joint_state_ctrl_msg.position = [0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0]
+        self.joint_state_ctrl_msg.velocity = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0]
+        self.joint_state_ctrl_msg.effort = [0.0] * 6
 
         # 이전 데이터 값 초기화
         self.last_data0 = None
