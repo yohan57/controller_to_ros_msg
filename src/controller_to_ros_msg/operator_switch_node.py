@@ -3,7 +3,7 @@ from rclpy.node import Node
 from std_msgs.msg import UInt8MultiArray
 from piper_msgs.msg import PiperStatusMsg
 from sensor_msgs.msg import JointState
-
+import copy
 class OperatorSwitchNode(Node):
     def __init__(self):
         super().__init__('operator_switch_node')
@@ -99,6 +99,10 @@ class OperatorSwitchNode(Node):
         if pose_name == 'center':
             self.current_joint_state_msg.velocity[6] = 30.0
             self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
+                        # 깊은 복사로 값만 복사 (참조가 아닌)
+            self.current_joint_state_msg.position = copy.deepcopy(self.center_joint_state_msg.position)
+            self.current_joint_state_msg.velocity = copy.deepcopy(self.center_joint_state_msg.velocity)
+            self.current_joint_state_msg.effort = copy.deepcopy(self.center_joint_state_msg.effort)
         elif pose_name == 'gripper_open':
             self.current_joint_state_msg.position[6] = 0.5
             self.center_joint_state_msg.position[6] = 0.5
