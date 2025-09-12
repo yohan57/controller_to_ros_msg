@@ -99,7 +99,6 @@ class OperatorSwitchNode(Node):
         if pose_name == 'center':
             self.current_joint_state_msg.velocity[6] = 30.0
             self.joint_ctrl_publisher.publish(self.center_joint_state_msg)
-            self.current_joint_state_msg = self.center_joint_state_msg
         elif pose_name == 'gripper_open':
             self.current_joint_state_msg.position[6] = 0.5
             self.center_joint_state_msg.position[6] = 0.5
