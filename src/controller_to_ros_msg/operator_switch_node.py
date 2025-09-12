@@ -68,23 +68,15 @@ class OperatorSwitchNode(Node):
                 self.set_preset_pose('gripper_close')
             return
 
-        if self.last_data1 is None or (data1, data2) != (self.last_data1, self.last_data2):
-            if data1 == 1 and data2 == 0:
-                self.get_logger().info('Action for data[1] == 1 and data[2] == 0 triggered.')
-                self.last_data1 = data1
-                self.last_data2 = data2
-                self.set_preset_pose('front')
-            elif data2 == 1 and data1 == 0:
-                self.get_logger().info('Action for data[2] == 1 and data[1] == 0 triggered.')
-                self.last_data1 = data1
-                self.last_data2 = data2
-                self.set_preset_pose('behind')
-            elif data2 == 0 and data1 == 0:
-                self.get_logger().info('Action for data[2] == 0 and data[1] == 0 triggered.')
-                self.last_data1 = data1
-                self.last_data2 = data2
-                self.set_preset_pose('center')
-
+        if data1 == 1 and data2 == 0:
+            self.get_logger().info('Action for data[1] == 1 triggered.')
+            self.set_preset_pose('front')
+        if data2 == 1 and data1 == 0:
+            self.get_logger().info('Action for data[2] == 1 triggered.')
+            self.set_preset_pose('behind')
+        if data2 == 0 and data1 == 0:
+            self.get_logger().info('Action for data[2] == 0 triggered.')
+            self.set_preset_pose('center')
 
     def arm_status_callback(self, msg):
         """arm_status 토픽 콜백 함수"""
