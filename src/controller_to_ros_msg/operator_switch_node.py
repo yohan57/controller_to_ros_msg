@@ -123,20 +123,28 @@ class OperatorSwitchNode(Node):
             self.current_joint_state_msg.velocity[6] = 30.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'front':         
-            self.current_joint_state_msg.position[0] = 0.017670771999999998
-            self.current_joint_state_msg.position[1] = 1.9704044640000002
-            self.current_joint_state_msg.position[2] = -1.360754108
-            self.current_joint_state_msg.position[3] = -0.025555460000000002
-            self.current_joint_state_msg.position[4] = -0.575721776
-            self.current_joint_state_msg.position[5] = 1.64113152
+            self.current_joint_state_msg.position[0] = 0.019118624000000004
+            self.current_joint_state_msg.position[1] = 1.9516696080000002
+            self.current_joint_state_msg.position[2] = -2.165341164
+            self.current_joint_state_msg.position[3] = -0.059588704
+            self.current_joint_state_msg.position[4] = 0.20589153200000002
+            self.current_joint_state_msg.position[5] = 1.641637396
+            self.current_joint_state_msg.velocity[6] = 20.0
+            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
+            # self.current_joint_state_msg.position[0] = 0.017670771999999998
+            # self.current_joint_state_msg.position[1] = 1.9704044640000002
+            # self.current_joint_state_msg.position[2] = -1.360754108
+            # self.current_joint_state_msg.position[3] = -0.025555460000000002
+            # self.current_joint_state_msg.position[4] = -0.575721776
+            # self.current_joint_state_msg.position[5] = 1.64113152
             # self.current_joint_state_msg.position[0] = -0.03148642
             # self.current_joint_state_msg.position[1] = 2.075818556
             # self.current_joint_state_msg.position[2] = -1.3262673200000001
             # self.current_joint_state_msg.position[3] = 0.156839004
             # self.current_joint_state_msg.position[4] = -0.31172428
             # self.current_joint_state_msg.position[5] = 1.529908576
-            self.current_joint_state_msg.velocity[6] = 20.0
-            self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
+            # self.current_joint_state_msg.velocity[6] = 20.0
+            # self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
 
         self.get_logger().info(f'Published JointState to set {pose_name} on topic joint_ctrl_single.')
 
