@@ -117,30 +117,30 @@ class OperatorSwitchNode(Node):
             self.current_joint_state_msg.velocity[6] = 15.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'give_coffee':
-            self.current_joint_state_msg.position[0] = 0.054652052000000007
+            self.current_joint_state_msg.position[0] = 0.0
             self.current_joint_state_msg.position[1] = 2.166771572
             self.current_joint_state_msg.position[2] = -2.2584049040000003
-            self.current_joint_state_msg.position[3] = -0.06272862400000001
-            self.current_joint_state_msg.position[4] = 1.234965424
-            self.current_joint_state_msg.position[5] = 1.439600988
+            self.current_joint_state_msg.position[3] = 0.0
+            self.current_joint_state_msg.position[4] = 1.235
+            self.current_joint_state_msg.position[5] = 1.44
             self.current_joint_state_msg.velocity[6] = 30.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'take_coffee':         
             self.current_joint_state_msg.position[0] = 1.698749052
             self.current_joint_state_msg.position[1] = 2.7208279
             self.current_joint_state_msg.position[2] = -2.272447324
-            self.current_joint_state_msg.position[3] = 0.132103412
-            self.current_joint_state_msg.position[4] = 0.914711028
-            self.current_joint_state_msg.position[5] = 1.5675527280000001
+            self.current_joint_state_msg.position[3] = 0.0
+            self.current_joint_state_msg.position[4] = 1.235
+            self.current_joint_state_msg.position[5] = 1.44
             self.current_joint_state_msg.velocity[6] = 20.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
         elif pose_name == 'lift':
             self.current_joint_state_msg.position[0] = 1.6523131240000002
             self.current_joint_state_msg.position[1] = 1.827293888
             self.current_joint_state_msg.position[2] = -2.0609039360000003
-            self.current_joint_state_msg.position[3] = 0.0470988
-            self.current_joint_state_msg.position[4] = 1.231092856
-            self.current_joint_state_msg.position[5] = 1.4634992680000003
+            self.current_joint_state_msg.position[3] = 0.00
+            self.current_joint_state_msg.position[4] = 1.235
+            self.current_joint_state_msg.position[5] = 1.44
             self.current_joint_state_msg.velocity[6] = 20.0
             self.joint_ctrl_publisher.publish(self.current_joint_state_msg)
 
